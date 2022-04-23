@@ -22,6 +22,14 @@ public class Order {
         return totalCookingTime;
     }
 
+    public Tablet getTablet() {
+        return tablet;
+    }
+
+    public List<Dish> getDishes() {
+        return dishes;
+    }
+
     public boolean isEmpty() {
         return dishes.isEmpty();
     }
