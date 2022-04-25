@@ -3,6 +3,8 @@ package com.javarush.task.task27.task2712;
 import com.javarush.task.task27.task2712.ad.AdvertisementManager;
 import com.javarush.task.task27.task2712.ad.NoVideoAvailableException;
 import com.javarush.task.task27.task2712.kitchen.Order;
+import com.javarush.task.task27.task2712.statistic.StatisticManager;
+import com.javarush.task.task27.task2712.statistic.event.VideoSelectedEventDataRow;
 
 import java.io.IOException;
 import java.util.Observable;
@@ -22,7 +24,13 @@ public class Tablet extends Observable {
         try {
             order = new Order(this);
             ConsoleHelper.writeMessage(order.toString());
-            new AdvertisementManager(order.getTotalCookingTime() * 60).processVideos();
+
+            AdvertisementManager advertisementManager = new AdvertisementManager(order.getTotalCookingTime() * 60);
+            StatisticManager statisticManager = StatisticManager.getInstance();
+
+            advertisementManager.processVideos();
+            statisticManager.register(new VideoSelectedEventDataRow(advertisementManager.getOptimalVideoSet(), advertisementManager.getMaxAmount(), advertisementManager.getTotalTimeSecondsLeft()));
+            ConsoleHelper.writeMessage("");
             if (!order.isEmpty()) {
                 setChanged();
                 notifyObservers(order);

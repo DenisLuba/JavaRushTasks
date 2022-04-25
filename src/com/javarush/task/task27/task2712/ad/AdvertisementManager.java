@@ -21,6 +21,18 @@ public class AdvertisementManager {
     private List<Advertisement> optimalVideoSet;
     private int totalTimeSecondsLeft;
 
+    public long getMaxAmount() {
+        return maxAmount;
+    }
+
+    public List<Advertisement> getOptimalVideoSet() {
+        return optimalVideoSet;
+    }
+
+    public int getTotalTimeSecondsLeft() {
+        return totalTimeSecondsLeft;
+    }
+
     private void obtainOptimalVideoSet(List<Advertisement> totalList, int currentTimeSecondsLeft, long currentAmount) {
         if (currentTimeSecondsLeft < 0) {
             return;
