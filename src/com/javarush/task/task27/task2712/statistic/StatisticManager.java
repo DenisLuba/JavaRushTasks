@@ -67,6 +67,49 @@ public class StatisticManager {
         return sortedMap;
     }
 
+    public SortedMap<String, ArrayList<EventDataRow>> getMapByDate(EventType eventType) {
+        // мапа с соответствием даты типа String со списком событий определенного типа в эту дату
+        HashMap<String, ArrayList<EventDataRow>> map = new HashMap<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH); // формат даты
+
+        // пробежимся по хранилищу класса StaticStorage, создадим новую мапу с соответствием даты и списка событий
+        for (Map.Entry<EventType, List<EventDataRow>> entry : statisticStorage.getStorage().entrySet()) {
+            if (entry.getKey() == eventType) { // выберем только нужные нам события
+                ArrayList<EventDataRow> eventDataRows = (ArrayList<EventDataRow>) entry.getValue(); // список событий необходимого нам типа
+
+                for (EventDataRow eventDataRow : eventDataRows) { // пробежимся по всем событиям в списке
+                    // добавим в результирующую мапу соответствие дат нужного формата типа String и событий нужного типа этого дня
+                    String date = formatter.format(eventDataRow.getDate());
+                    if (map.containsKey(date)) {
+                        map.get(date).add(eventDataRow);
+                    }
+                    else {
+                        ArrayList<EventDataRow> newList = new ArrayList<>();
+                        newList.add(eventDataRow);
+                        map.put(date, newList);
+                    }
+                }
+            }
+        }
+
+        // поместим мапу в тримапу для сортировки по дате через формат даты
+        SortedMap<String, ArrayList<EventDataRow>> sortedMap = new TreeMap<>(Collections.reverseOrder(new Comparator<String>() {
+            DateFormat format = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
+            @Override
+            public int compare(String o1, String o2) {
+                try {
+                    return format.parse(o1).compareTo(format.parse(o2));
+                } catch (ParseException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+        }));
+
+        sortedMap.putAll(map);
+
+        return sortedMap;
+    }
+
 
     private class StatisticStorage {
         Map<EventType, List<EventDataRow>> storage;
