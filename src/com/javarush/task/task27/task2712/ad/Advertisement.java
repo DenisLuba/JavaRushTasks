@@ -1,16 +1,21 @@
 package com.javarush.task.task27.task2712.ad;
 
-import com.javarush.task.task27.task2712.ConsoleHelper;
-
-import java.util.Objects;
-
 public class Advertisement {
-    private Object content; // видео рекламы
-    private String name; // название рекламы
-    private long initialAmount; // сумма за все показы ролика в копейках
-    private int hits; // количество оплаченных показов рекламы
-    private int duration; // продолжительность рекламы в секундах
-    private long amountPerOneDisplaying; // стоимость одного ролика в копейках
+    //видео
+    private Object content;
+
+    private String name;
+
+    //начальная сумма, стоимость рекламы в копейках. Используем long, чтобы избежать проблем с округлением
+    private long initialAmount;
+
+    //количество оплаченных показов
+    private int hits;
+
+    //продолжительность в секундах
+    private int duration;
+
+    private long amountPerOneDisplaying;
 
     public Advertisement(Object content, String name, long initialAmount, int hits, int duration) {
         this.content = content;
@@ -18,10 +23,9 @@ public class Advertisement {
         this.initialAmount = initialAmount;
         this.hits = hits;
         this.duration = duration;
-        try {
+
+        if (hits > 0) {
             amountPerOneDisplaying = initialAmount / hits;
-        } catch (ArithmeticException e) {
-            ConsoleHelper.writeMessage("Количество показов равно нулю.");
         }
     }
 
@@ -37,10 +41,14 @@ public class Advertisement {
         return amountPerOneDisplaying;
     }
 
-    public void revalidate() throws UnsupportedOperationException { // уменьшение количества оставшихся показов этого ролика
-        if (hits <= 0) throw new UnsupportedOperationException();
+    public void revalidate() {
+        if (hits == 0) {
+            throw new UnsupportedOperationException();
+        }
         hits--;
     }
 
-    public boolean isActive() {return hits > 0;}
+    public boolean isActive() {
+        return hits > 0;
+    }
 }

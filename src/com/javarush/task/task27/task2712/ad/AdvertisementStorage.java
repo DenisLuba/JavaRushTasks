@@ -1,30 +1,25 @@
 package com.javarush.task.task27.task2712.ad;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class AdvertisementStorage {
-    private static AdvertisementStorage INSTANCE;
-    private final List<Advertisement> videos = new ArrayList<>();
-
-    private AdvertisementStorage() {
-        Object someContent = new Object();
-        for (int i = 0; i < 1000; i++) {
-            long iA = (long) (Math.random() * 10000 + 100);
-            int h = (int) (Math.random() * 10 + 1);
-            int d = (int) (Math.random() * 600 + 10);
-            videos.add(new Advertisement(someContent, "" + i, iA, h, d));
-        }
-
-        for (int i = 0; i < 10; i++) videos.add(new Advertisement(someContent, "replay", 10000, 1, 10));
-//        videos.add(new Advertisement(someContent, "First Video", 5000, 100, 3 * 60)); // 3 min
-//        videos.add(new Advertisement(someContent, "Second Video", 100, 10, 15 * 60)); // 15 min
-//        videos.add(new Advertisement(someContent, "Third Video", 400, 2, 10 * 60)); // 10 min
+    private static class InstanceHolder {
+        private static final AdvertisementStorage ourInstance = new AdvertisementStorage();
     }
 
     public static AdvertisementStorage getInstance() {
-        if (INSTANCE == null) INSTANCE = new AdvertisementStorage();
-        return INSTANCE;
+        return InstanceHolder.ourInstance;
+    }
+
+    private final List<Advertisement> videos = new LinkedList<>();
+
+    private AdvertisementStorage() {
+        //init random videos
+        Object someContent = new Object();
+        videos.add(new Advertisement(someContent, "First Video", 5000, 100, 3 * 60));   //weight=277
+        videos.add(new Advertisement(someContent, "Second Video", 100, 10, 15 * 60));   //weight=11
+        videos.add(new Advertisement(someContent, "Third Video", 400, 2, 10 * 60));     //weight=333
     }
 
     public List<Advertisement> list() {
