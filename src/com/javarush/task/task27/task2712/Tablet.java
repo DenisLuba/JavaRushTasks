@@ -30,7 +30,6 @@ public class Tablet extends Observable {
 
             advertisementManager.processVideos();
             statisticManager.register(new VideoSelectedEventDataRow(advertisementManager.getOptimalVideoSet(), advertisementManager.getMaxAmount(), advertisementManager.getTotalTimeSecondsLeft()));
-            ConsoleHelper.writeMessage("");
             if (!order.isEmpty()) {
                 setChanged();
                 notifyObservers(order);

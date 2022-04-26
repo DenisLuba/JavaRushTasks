@@ -10,6 +10,7 @@ public class Restaurant {
         Tablet tablet = new Tablet(5);
         Cook cook = new Cook("Amigo");
         Waiter waiter = new Waiter();
+        DirectorTablet directorTablet = new DirectorTablet();
 
         tablet.addObserver(cook);
         cook.addObserver(waiter);
@@ -18,5 +19,10 @@ public class Restaurant {
         tablet.createOrder();
         tablet.createOrder();
         tablet.createOrder();
+
+        directorTablet.printAdvertisementProfit();
+        directorTablet.printCookWorkloading();
+        directorTablet.printActiveVideoSet();
+        directorTablet.printArchivedVideoSet();
     }
 }
