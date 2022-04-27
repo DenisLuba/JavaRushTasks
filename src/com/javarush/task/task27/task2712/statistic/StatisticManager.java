@@ -1,131 +1,100 @@
 package com.javarush.task.task27.task2712.statistic;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.javarush.task.task27.task2712.kitchen.Cook;
+import com.javarush.task.task27.task2712.statistic.event.CookedOrderEventDataRow;
 import com.javarush.task.task27.task2712.statistic.event.EventDataRow;
 import com.javarush.task.task27.task2712.statistic.event.EventType;
 import com.javarush.task.task27.task2712.statistic.event.VideoSelectedEventDataRow;
 
-public class StatisticManager {
-    private static StatisticManager INSTANCE;
-    private StatisticStorage statisticStorage = new StatisticStorage();
-    private Set cooks = new HashSet();
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-    private StatisticManager() {}
+public class StatisticManager {
+    private static StatisticManager ourInstance = new StatisticManager();
 
     public static StatisticManager getInstance() {
-        if (INSTANCE == null) INSTANCE = new StatisticManager();
-        return INSTANCE;
+        return ourInstance;
     }
 
-    public void register(EventDataRow data) {
-        statisticStorage.put(data);
+    private StatisticStorage statisticStorage = new StatisticStorage();
+    private Set<Cook> cooks = new HashSet<>();
+
+    private StatisticManager() {
     }
-
-    public void register(Cook cook) {
-        cooks.add(cook);
-    }
-
-    public SortedMap<String, Long> getMapOfAmountsByDate() {
-        HashMap<String, Long> mapOfAmountsByDate = new HashMap<>();
-        SimpleDateFormat formatter = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
-
-        // пробежимся по хранилищу класса StaticStorage, создадим новую мапу с соответствием даты и суммы каждого видео-события
-        for (Map.Entry<EventType, List<EventDataRow>> entry : statisticStorage.getStorage().entrySet()) {
-            if (entry.getKey() == EventType.SELECTED_VIDEOS) { // выберем только события, связанные с рекламой
-                ArrayList<EventDataRow> eventDataRows = (ArrayList<EventDataRow>) entry.getValue();
-                for (EventDataRow eventDataRow : eventDataRows) { // пробежимся по всем событиям в списке видео-событий
-                    VideoSelectedEventDataRow videoSelectedEventDataRow = (VideoSelectedEventDataRow) eventDataRow;
-                    // добавим в результирующую мапу соответствие дат нужного формата типа String и сумм в копейках, полученных за рекламу
-                    String date = formatter.format(videoSelectedEventDataRow.getDate());
-                    long amount = videoSelectedEventDataRow.getAmount();
-                    if (mapOfAmountsByDate.containsKey(date)) amount += mapOfAmountsByDate.get(date);
-                    mapOfAmountsByDate.put(date, amount);
-                }
-            }
-        }
-
-        // поместим мапу в тримапу для сортировки по дате через формат даты
-        SortedMap<String, Long> sortedMap = new TreeMap<>(Collections.reverseOrder(new Comparator<String>() {
-            DateFormat format = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
-            @Override
-            public int compare(String o1, String o2) {
-               try {
-                   return format.parse(o1).compareTo(format.parse(o2));
-               } catch (ParseException e) {
-                   throw new IllegalArgumentException(e);
-               }
-            }
-        }));
-
-        sortedMap.putAll(mapOfAmountsByDate);
-
-        return sortedMap;
-    }
-
-    public SortedMap<String, ArrayList<EventDataRow>> getMapByDate(EventType eventType) {
-        // мапа с соответствием даты типа String со списком событий определенного типа в эту дату
-        HashMap<String, ArrayList<EventDataRow>> map = new HashMap<>();
-        SimpleDateFormat formatter = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH); // формат даты
-
-        // пробежимся по хранилищу класса StaticStorage, создадим новую мапу с соответствием даты и списка событий
-        for (Map.Entry<EventType, List<EventDataRow>> entry : statisticStorage.getStorage().entrySet()) {
-            if (entry.getKey() == eventType) { // выберем только нужные нам события
-                ArrayList<EventDataRow> eventDataRows = (ArrayList<EventDataRow>) entry.getValue(); // список событий необходимого нам типа
-
-                for (EventDataRow eventDataRow : eventDataRows) { // пробежимся по всем событиям в списке
-                    // добавим в результирующую мапу соответствие дат нужного формата типа String и событий нужного типа этого дня
-                    String date = formatter.format(eventDataRow.getDate());
-                    if (map.containsKey(date)) {
-                        map.get(date).add(eventDataRow);
-                    }
-                    else {
-                        ArrayList<EventDataRow> newList = new ArrayList<>();
-                        newList.add(eventDataRow);
-                        map.put(date, newList);
-                    }
-                }
-            }
-        }
-
-        // поместим мапу в тримапу для сортировки по дате через формат даты
-        SortedMap<String, ArrayList<EventDataRow>> sortedMap = new TreeMap<>(Collections.reverseOrder(new Comparator<String>() {
-            DateFormat format = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
-            @Override
-            public int compare(String o1, String o2) {
-                try {
-                    return format.parse(o1).compareTo(format.parse(o2));
-                } catch (ParseException e) {
-                    throw new IllegalArgumentException(e);
-                }
-            }
-        }));
-
-        sortedMap.putAll(map);
-
-        return sortedMap;
-    }
-
 
     private class StatisticStorage {
-        Map<EventType, List<EventDataRow>> storage;
+        private Map<EventType, List<EventDataRow>> storage = new HashMap<>();
 
-        public StatisticStorage() {
-            storage = new HashMap<>();
-            for (EventType eventType : EventType.values())
-                storage.put(eventType, new ArrayList<EventDataRow>());
-        }
-
-        public Map<EventType, List<EventDataRow>> getStorage() {
-            return storage;
+        private StatisticStorage() {
+            for (EventType type : EventType.values()) {
+                this.storage.put(type, new ArrayList<EventDataRow>());
+            }
         }
 
         private void put(EventDataRow data) {
-            storage.get(data.getType()).add(data);
+            EventType type = data.getType();
+            if (!this.storage.containsKey(type))
+                throw new UnsupportedOperationException();
+
+            this.storage.get(type).add(data);
         }
+
+        private List<EventDataRow> get(EventType type) {
+            if (!this.storage.containsKey(type))
+                throw new UnsupportedOperationException();
+
+            return this.storage.get(type);
+        }
+    }
+
+    public void register(EventDataRow data) {
+        this.statisticStorage.put(data);
+    }
+
+    public void register(Cook cook) {
+        this.cooks.add(cook);
+    }
+
+    public Map<String, Long> getProfitMap() {
+        Map<String, Long> res = new HashMap();
+        List<EventDataRow> rows = statisticStorage.get(EventType.SELECTED_VIDEOS);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+        long total = 0l;
+        for (EventDataRow row : rows) {
+            VideoSelectedEventDataRow dataRow = (VideoSelectedEventDataRow) row;
+            String date = format.format(dataRow.getDate());
+            if (!res.containsKey(date)) {
+                res.put(date, 0l);
+            }
+            total += dataRow.getAmount();
+            res.put(date, res.get(date) + dataRow.getAmount());
+        }
+
+        res.put("Total", total);
+
+        return res;
+    }
+
+    public Map<String, Map<String, Integer>> getCookWorkloadingMap() {
+        Map<String, Map<String, Integer>> res = new HashMap(); //name, time
+        List<EventDataRow> rows = statisticStorage.get(EventType.COOKED_ORDER);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+        for (EventDataRow row : rows) {
+            CookedOrderEventDataRow dataRow = (CookedOrderEventDataRow) row;
+            String date = format.format(dataRow.getDate());
+            if (!res.containsKey(date)) {
+                res.put(date, new HashMap<String, Integer>());
+            }
+            Map<String, Integer> cookMap = res.get(date);
+            String cookName = dataRow.getCookName();
+            if (!cookMap.containsKey(cookName)) {
+                cookMap.put(cookName, 0);
+            }
+
+            Integer totalTime = cookMap.get(cookName);
+            cookMap.put(cookName, totalTime + dataRow.getTime());
+        }
+
+        return res;
     }
 }
