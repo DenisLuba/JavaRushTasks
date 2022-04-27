@@ -1,13 +1,14 @@
 package com.javarush.task.task27.task2712;
 
+import com.javarush.task.task27.task2712.ad.Advertisement;
+import com.javarush.task.task27.task2712.ad.StatisticAdvertisementManager;
 import com.javarush.task.task27.task2712.statistic.StatisticManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class DirectorTablet {
+
+    StatisticAdvertisementManager statisticAdvertisementManager = StatisticAdvertisementManager.getInstance();
 
     public void printAdvertisementProfit() {
         StatisticManager statisticManager = StatisticManager.getInstance();
@@ -42,10 +43,30 @@ public class DirectorTablet {
     }
 
     public void printActiveVideoSet() {
+        printVideoSet(true);
 
     }
 
     public void printArchivedVideoSet() {
+        printVideoSet(false);
+    }
 
+    Comparator<Advertisement> comparatorListOfVideos = new Comparator<Advertisement>() {
+        @Override
+        public int compare(Advertisement o1, Advertisement o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
+
+    private void printVideoSet(boolean active) {
+        ArrayList<Advertisement> listOfVideos = statisticAdvertisementManager.getListOfAds(active);
+        listOfVideos.sort(comparatorListOfVideos);
+        for (Advertisement advertisement : listOfVideos) {
+            String name = advertisement.getName();
+            if (active) {
+                int hits = advertisement.getHits();
+                System.out.printf("%s - %d\n", name, hits);
+            } else System.out.println(name);
+        }
     }
 }
