@@ -12,7 +12,7 @@ public class Order {
 
     public Order(Tablet tablet) throws IOException {
         this.tablet = tablet;
-        dishes = ConsoleHelper.getAllDishesForOrder();
+        initDishes();
     }
 
     public int getTotalCookingTime() {
@@ -32,6 +32,12 @@ public class Order {
 
     public boolean isEmpty() {
         return dishes.isEmpty();
+    }
+
+
+    protected void initDishes() throws IOException {
+//        System.out.println("initDishes in Order");
+        dishes = ConsoleHelper.getAllDishesForOrder();
     }
 
     @Override
