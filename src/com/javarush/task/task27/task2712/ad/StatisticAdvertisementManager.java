@@ -1,6 +1,7 @@
 package com.javarush.task.task27.task2712.ad;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class StatisticAdvertisementManager {
     private static StatisticAdvertisementManager statisticAdvertisementManager = new StatisticAdvertisementManager();
@@ -14,7 +15,7 @@ public class StatisticAdvertisementManager {
     }
 
     public ArrayList<Advertisement> getListOfAds(boolean active){
-        ArrayList<Advertisement> listOfAllVideos = (ArrayList<Advertisement>) storage.list();
+        LinkedList<Advertisement> listOfAllVideos = (LinkedList<Advertisement>) storage.list();
         ArrayList<Advertisement> result = new ArrayList<>();
 
         for (Advertisement advertisement : listOfAllVideos) {

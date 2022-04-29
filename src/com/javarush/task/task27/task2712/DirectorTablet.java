@@ -54,7 +54,7 @@ public class DirectorTablet {
     Comparator<Advertisement> comparatorListOfVideos = new Comparator<Advertisement>() {
         @Override
         public int compare(Advertisement o1, Advertisement o2) {
-            return o1.getName().compareTo(o2.getName());
+            return o1.getName().toLowerCase(Locale.ROOT).compareTo(o2.getName().toLowerCase(Locale.ROOT));
         }
     };
 
