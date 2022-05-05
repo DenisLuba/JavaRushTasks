@@ -10,10 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class StatisticManager {
-    private static StatisticManager ourInstance = new StatisticManager();
+    private static StatisticManager instance = new StatisticManager();
 
     public static StatisticManager getInstance() {
-        return ourInstance;
+        return instance;
     }
 
     private StatisticStorage statisticStorage = new StatisticStorage();

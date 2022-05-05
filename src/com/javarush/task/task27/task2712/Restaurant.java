@@ -2,6 +2,7 @@ package com.javarush.task.task27.task2712;
 
 import com.javarush.task.task27.task2712.kitchen.Cook;
 import com.javarush.task.task27.task2712.kitchen.Waiter;
+import com.javarush.task.task27.task2712.statistic.StatisticManager;
 
 import java.util.List;
 import java.io.IOException;
@@ -14,31 +15,32 @@ public class Restaurant {
         return ORDER_CREATING_INTERVAL;
     }
     public static void main(String[] args) throws IOException {
-        List<Tablet> tabletList = new ArrayList<Tablet>();
-        tabletList.add(new Tablet(1));
-        tabletList.add(new Tablet(2));
-        tabletList.add(new Tablet(3));
-        tabletList.add(new Tablet(4));
+        Cook cookAmigo = new Cook("Amigo");
+        Cook cookRobert = new Cook("Robert");
 
-//        Tablet tablet = new Tablet(5);
-        Cook cook = new Cook("Amigo");
+        StatisticManager statisticManager = StatisticManager.getInstance();
+        statisticManager.register(cookAmigo);
+        statisticManager.register(cookRobert);
+
         Waiter waiter = new Waiter();
         DirectorTablet directorTablet = new DirectorTablet();
+        List<Tablet> tablets = new ArrayList<Tablet>();
+        for(int i = 0; i < 5; i++) {
+            Tablet tablet = new Tablet(i);
+            tablets.add(tablet);
+            tablet.addObserver(cookAmigo);
+            tablet.addObserver(cookRobert);
+        }
 
-        for(Tablet tablet : tabletList)
-            tablet.addObserver(cook);
-//        tablet.addObserver(cook);
-        cook.addObserver(waiter);
+        cookAmigo.addObserver(waiter);
+        cookRobert.addObserver(waiter);
 
-        Thread thread = new Thread(new RandomOrderGeneratorTask(tabletList, ORDER_CREATING_INTERVAL));
+        Thread thread = new Thread(new RandomOrderGeneratorTask(tablets, ORDER_CREATING_INTERVAL));
         thread.start();
-//        tablet.createOrder();
-//        tablet.createOrder();
-//        tablet.createOrder();
-//        tablet.createOrder();
 
         try {
-            Thread.sleep(600);
+            Thread.sleep(1000);
+            thread.interrupt();
         } catch (InterruptedException e) {
 
         }
@@ -48,6 +50,4 @@ public class Restaurant {
         directorTablet.printActiveVideoSet();
         directorTablet.printArchivedVideoSet();
     }
-
-
 }
