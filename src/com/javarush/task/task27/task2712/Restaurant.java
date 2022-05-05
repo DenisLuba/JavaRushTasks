@@ -24,12 +24,13 @@ public class Restaurant {
 
         Waiter waiter = new Waiter();
         DirectorTablet directorTablet = new DirectorTablet();
+        OrderManager orderManager = new OrderManager();
         List<Tablet> tablets = new ArrayList<Tablet>();
         for(int i = 0; i < 5; i++) {
             Tablet tablet = new Tablet(i);
             tablets.add(tablet);
-            tablet.addObserver(cookAmigo);
-            tablet.addObserver(cookRobert);
+            tablet.addObserver(orderManager);
+            tablet.addObserver(orderManager);
         }
 
         cookAmigo.addObserver(waiter);
