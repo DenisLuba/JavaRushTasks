@@ -17,9 +17,13 @@ public class StatisticManager {
     }
 
     private StatisticStorage statisticStorage = new StatisticStorage();
-    private Set<Cook> cooks = new HashSet<>();
+    private static Set<Cook> cooks = new HashSet<>();
 
     private StatisticManager() {
+    }
+
+    public Set<Cook> getCooks() {
+        return cooks;
     }
 
     private class StatisticStorage {

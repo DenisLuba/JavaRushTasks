@@ -10,8 +10,14 @@ import java.util.Observer;
 
 public class Cook extends Observable {
     private String name;
+    private boolean busy;
+
     public Cook(String name) {
         this.name = name;
+    }
+
+    public boolean isBusy() {
+        return busy;
     }
 
     @Override
@@ -20,10 +26,18 @@ public class Cook extends Observable {
     }
 
     public void startCookingOrder(Order order) {
+        busy = true;
         ConsoleHelper.writeMessage("Start cooking - " + order + ", cooking time " + order.getTotalCookingTime() + "min");
         setChanged();
         notifyObservers(order);
         StatisticManager statisticManager = StatisticManager.getInstance();
         statisticManager.register(new CookedOrderEventDataRow(order.getTablet().toString(), name, order.getTotalCookingTime(), order.getDishes()));
+        try {
+            Thread.sleep(order.getTotalCookingTime() * 10L);
+        } catch (InterruptedException e) {
+            ConsoleHelper.writeMessage("InterruptedException in method startCookingOrder");
+        } finally {
+            busy = false;
+        }
     }
 }
