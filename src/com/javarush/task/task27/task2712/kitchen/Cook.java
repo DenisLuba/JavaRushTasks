@@ -7,13 +7,21 @@ import com.javarush.task.task27.task2712.statistic.event.CookedOrderEventDataRow
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class Cook extends Observable {
+public class Cook extends Observable implements Runnable {
+
+    private LinkedBlockingQueue<Order> queue = new LinkedBlockingQueue<>();
     private String name;
     private boolean busy;
 
     public Cook(String name) {
         this.name = name;
+    }
+
+    public void setQueue(LinkedBlockingQueue<Order> queue) {
+        this.queue = queue;
     }
 
     public boolean isBusy() {
@@ -39,5 +47,35 @@ public class Cook extends Observable {
         } finally {
             busy = false;
         }
+    }
+
+    @Override
+    public void run() {
+        Order order;
+        while (true) {
+            if(!this.isBusy() && ((order = queue.poll()) != null))
+                this.startCookingOrder(order);
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+//        Set<Cook> cooks = StatisticManager.getInstance().getCooks(); // отсюда будем брать список поваров
+//        Order order;
+//
+//        while (true) { // вечный фоновый цикл поиска заказов и передачи их свободным поварам
+//            for(Cook cook : cooks) {
+//                if(!cook.isBusy() && ((order = queue.poll()) != null))
+//                    cook.startCookingOrder(order);
+//            }
+//
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
     }
 }
