@@ -1,7 +1,5 @@
 package com.javarush.task.task27.task2712;
 
-import com.javarush.task.task27.task2712.kitchen.Order;
-
 import java.util.List;
 
 public class RandomOrderGeneratorTask implements Runnable {
@@ -15,18 +13,16 @@ public class RandomOrderGeneratorTask implements Runnable {
 
     @Override
     public void run() {
-        int randomTablet = (int) (Math.random() * tablets.size());
-        System.out.printf("%d - tablets.size; %d - randomTables;", tablets.size(), randomTablet);
         if (tablets.size() > 0) {
-//            int k = 5;
-            // while (k > 0) {
             while (!Thread.currentThread().isInterrupted()) {
+                int randomTablet = (int) (Math.random() * tablets.size());
+                System.out.printf("%d - tablets.size; %d - randomTables;", tablets.size(), randomTablet);
                 tablets.get(randomTablet).createTestOrder();
-//            k--;
                 try {
                     Thread.sleep(orderCreatingInterval);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    ConsoleHelper.writeMessage("InterruptedException in class RandomOrderGeneratorTask");
+                    Thread.currentThread().interrupt();
                 }
             }
         }

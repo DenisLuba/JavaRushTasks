@@ -52,30 +52,16 @@ public class Cook extends Observable implements Runnable {
     @Override
     public void run() {
         Order order;
-        while (true) {
-            if(!this.isBusy() && ((order = queue.poll()) != null))
-                this.startCookingOrder(order);
+        while (!Thread.currentThread().isInterrupted()) {
+            if(!isBusy() && ((order = queue.poll()) != null))
+                startCookingOrder(order);
 
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                ConsoleHelper.writeMessage("InterruptedException in class Cook");
+                Thread.currentThread().interrupt();
             }
         }
-//        Set<Cook> cooks = StatisticManager.getInstance().getCooks(); // отсюда будем брать список поваров
-//        Order order;
-//
-//        while (true) { // вечный фоновый цикл поиска заказов и передачи их свободным поварам
-//            for(Cook cook : cooks) {
-//                if(!cook.isBusy() && ((order = queue.poll()) != null))
-//                    cook.startCookingOrder(order);
-//            }
-//
-//            try {
-//                Thread.sleep(10);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
     }
 }
